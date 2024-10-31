@@ -3,7 +3,8 @@
 	"package": "org.by1337.bmenuparser.mixin",
 	"compatibilityLevel": "JAVA_8",
 	"mixins": [
-		"ExampleMixin"
+		"ClientPlayNetworkHandlerMixin",
+		"GameMessageS2CPacketMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

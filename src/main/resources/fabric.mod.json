@@ -13,9 +13,9 @@
 	},
 	"license": "MIT",
 	"icon": "assets/bmenuparser/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
-		"main": [
+		"client": [
 			"org.by1337.bmenuparser.BMenuParser"
 		]
 	},
