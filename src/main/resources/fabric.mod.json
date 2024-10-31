@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "bmenuparser",
+	"version": "${version}",
+	"name": "BMenuParser",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"By1337!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/bmenuparser/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"org.by1337.bmenuparser.BMenuParser"
+		]
+	},
+	"mixins": [
+		"bmenuparser.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.5",
+		"minecraft": "~1.16.5",
+		"java": ">=8",
+		"fabric": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
