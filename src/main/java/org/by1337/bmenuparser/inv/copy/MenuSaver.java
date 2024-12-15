@@ -129,47 +129,56 @@ public class MenuSaver {
                             )).append("'\n");
                         }
                     }
-                    if (tag.contains("Enchantments")) {
-                        NbtList enchantments = tag.getList("Enchantments", NbtType.COMPOUND);
-                        sb.append("    enchantments:\n");
+                }
+                if (tag.contains("CustomPotionColor")){
+                    int rgb = tag.getInt("CustomPotionColor");
+                    int BIT_MASK = 0xff;
+                    sb.append("    color: '#").append(String.format(
+                            "%02X%02X%02X",
+                            rgb >> 16 & BIT_MASK,
+                            rgb >> 8 & BIT_MASK,
+                            rgb >> 0 & BIT_MASK
+                    )).append("'\n");
+                }
+                if (tag.contains("Enchantments")) {
+                    NbtList enchantments = tag.getList("Enchantments", NbtType.COMPOUND);
+                    sb.append("    enchantments:\n");
 
-                        for (NbtElement obj : enchantments) {
-                            NbtCompound enchantment = (NbtCompound) obj;
-                            sb.append("      - ").append(enchantment.getString("id").split(":")[1]).append(";").append(enchantment.getInt("lvl")).append("\n");
-                        }
+                    for (NbtElement obj : enchantments) {
+                        NbtCompound enchantment = (NbtCompound) obj;
+                        sb.append("      - ").append(enchantment.getString("id").split(":")[1]).append(";").append(enchantment.getInt("lvl")).append("\n");
                     }
-                    if (tag.contains("HideFlags")) {
-                        int flags = tag.getInt("HideFlags");
-                        sb.append("    item_flags:");
+                }
+                if (tag.contains("HideFlags")) {
+                    int flags = tag.getInt("HideFlags");
+                    sb.append("    item_flags:");
 
-                        boolean has = false;
+                    boolean has = false;
 
-                        for (ItemFlag value : ItemFlag.values()) {
-                            byte bitModifier = ((byte) (1 << value.ordinal()));
-                            if ((flags & bitModifier) == bitModifier) {
-                                if (!has) {
-                                    sb.append("\n");
-                                    has = true;
-                                }
-                                sb.append("      - ").append(value.name()).append("\n");
+                    for (ItemFlag value : ItemFlag.values()) {
+                        byte bitModifier = ((byte) (1 << value.ordinal()));
+                        if ((flags & bitModifier) == bitModifier) {
+                            if (!has) {
+                                sb.append("\n");
+                                has = true;
                             }
-                        }
-                        if (!has) {
-                            sb.append(" [ ]");
+                            sb.append("      - ").append(value.name()).append("\n");
                         }
                     }
-
-                    if (tag.contains("SkullOwner")) {
-                        NbtCompound skullOwner = tag.getCompound("SkullOwner");
-                        if (skullOwner.contains("Properties")) {
-                            NbtCompound properties = skullOwner.getCompound("Properties");
-                            if (properties.contains("textures")) {
-                                NbtList lore = properties.getList("textures", NbtType.COMPOUND);
-                                if (!lore.isEmpty()) {
-                                    NbtCompound val = (NbtCompound) lore.get(0);
-                                    sb.append("    ").append("material: ").append(quoteAndEscape("basehead-" + val.getString("Value"))).append("\n");
-                                    isBaseHead = true;
-                                }
+                    if (!has) {
+                        sb.append(" [ ]");
+                    }
+                }
+                if (tag.contains("SkullOwner")) {
+                    NbtCompound skullOwner = tag.getCompound("SkullOwner");
+                    if (skullOwner.contains("Properties")) {
+                        NbtCompound properties = skullOwner.getCompound("Properties");
+                        if (properties.contains("textures")) {
+                            NbtList lore = properties.getList("textures", NbtType.COMPOUND);
+                            if (!lore.isEmpty()) {
+                                NbtCompound val = (NbtCompound) lore.get(0);
+                                sb.append("    ").append("material: ").append(quoteAndEscape("basehead-" + val.getString("Value"))).append("\n");
+                                isBaseHead = true;
                             }
                         }
                     }
@@ -204,26 +213,48 @@ public class MenuSaver {
         int tick = 0;
         StringBuilder frameBuilder = new StringBuilder();
         for (Map<Integer, String> frame : frames) {
-
             frameBuilder.append("  - tick: ").append(tick++).append("\n");
             frameBuilder.append("    opcodes:\n");
+
+            Map<String, List<Integer>> inverse = new HashMap<>();
+            frame.forEach((k, v) -> inverse.computeIfAbsent(v, ignore -> new ArrayList<>()).add(k));
+
             boolean isEmpty = true;
-            for (Integer i : frame.keySet()) {
-                String item = frame.get(i);
-                if (airs.contains(item)) {
-                    if (nonAirSlots.containsKey(i)) {
-                        frameBuilder.append("      - remove: ").append(i).append("\n");
-                        nonAirSlots.remove(i);
+
+            for (String item : inverse.keySet()) {
+                List<Integer> slots = inverse.get(item);
+                //if (slots.size() != 1) {
+                    if (airs.contains(item)) {
+                        slots.removeIf(s -> !nonAirSlots.containsKey(s));
+                        if (slots.isEmpty()) continue;
+                        frameBuilder.append("      - remove: ");
+                        slots.forEach(nonAirSlots::remove);
+                        isEmpty = false;
+                    } else {
+                        frameBuilder.append("      - set: ").append(item).append(" ");
                         isEmpty = false;
                     }
-
-                } else {
-                    frameBuilder.append("      - set: ").append(frame.get(i)).append(" ").append(i).append("\n");
-                    nonAirSlots.put(i, item);
-                    isEmpty = false;
-                }
-
+                    frameBuilder.append(Joiner.on(",").join(slots)).append("\n");
+                //}
             }
+
+//
+//            for (Integer i : frame.keySet()) {
+//                String item = frame.get(i);
+//                if (airs.contains(item)) {
+//                    if (nonAirSlots.containsKey(i)) {
+//                        frameBuilder.append("      - remove: ").append(i).append("\n");
+//                        nonAirSlots.remove(i);
+//                        isEmpty = false;
+//                    }
+//
+//                } else {
+//                    frameBuilder.append("      - set: ").append(frame.get(i)).append(" ").append(i).append("\n");
+//                    nonAirSlots.put(i, item);
+//                    isEmpty = false;
+//                }
+//
+//            }
             if (!isEmpty) {
                 sb.append(frameBuilder);
             } else {

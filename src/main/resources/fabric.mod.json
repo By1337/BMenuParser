@@ -3,13 +3,13 @@
 	"id": "bmenuparser",
 	"version": "${version}",
 	"name": "BMenuParser",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Mod for copying menus from servers",
 	"authors": [
-		"By1337!"
+		"By1337"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://discord.gg/bdev",
+		"sources": "https://github.com/By1337/BMenuParser"
 	},
 	"license": "MIT",
 	"icon": "assets/bmenuparser/icon.png",
@@ -23,7 +23,7 @@
 		"bmenuparser.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.5",
+		"fabricloader": ">=0.15.6",
 		"minecraft": "~1.16.5",
 		"java": ">=8",
 		"fabric": "*"
