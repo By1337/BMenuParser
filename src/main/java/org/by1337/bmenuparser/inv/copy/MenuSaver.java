@@ -130,7 +130,7 @@ public class MenuSaver {
                         }
                     }
                 }
-                if (tag.contains("CustomPotionColor")){
+                if (tag.contains("CustomPotionColor")) {
                     int rgb = tag.getInt("CustomPotionColor");
                     int BIT_MASK = 0xff;
                     sb.append("    color: '#").append(String.format(
@@ -223,38 +223,18 @@ public class MenuSaver {
 
             for (String item : inverse.keySet()) {
                 List<Integer> slots = inverse.get(item);
-                //if (slots.size() != 1) {
-                    if (airs.contains(item)) {
-                        slots.removeIf(s -> !nonAirSlots.containsKey(s));
-                        if (slots.isEmpty()) continue;
-                        frameBuilder.append("      - remove: ");
-                        slots.forEach(nonAirSlots::remove);
-                        isEmpty = false;
-                    } else {
-                        frameBuilder.append("      - set: ").append(item).append(" ");
-                        isEmpty = false;
-                    }
-                    frameBuilder.append(Joiner.on(",").join(slots)).append("\n");
-                //}
+                if (airs.contains(item)) {
+                    slots.removeIf(s -> !nonAirSlots.containsKey(s));
+                    if (slots.isEmpty()) continue;
+                    frameBuilder.append("      - remove: ");
+                    slots.forEach(nonAirSlots::remove);
+                    isEmpty = false;
+                } else {
+                    frameBuilder.append("      - set: ").append(item).append(" ");
+                    isEmpty = false;
+                }
+                frameBuilder.append(Joiner.on(",").join(slots)).append("\n");
             }
-
-//
-//            for (Integer i : frame.keySet()) {
-//                String item = frame.get(i);
-//                if (airs.contains(item)) {
-//                    if (nonAirSlots.containsKey(i)) {
-//                        frameBuilder.append("      - remove: ").append(i).append("\n");
-//                        nonAirSlots.remove(i);
-//                        isEmpty = false;
-//                    }
-//
-//                } else {
-//                    frameBuilder.append("      - set: ").append(frame.get(i)).append(" ").append(i).append("\n");
-//                    nonAirSlots.put(i, item);
-//                    isEmpty = false;
-//                }
-//
-//            }
             if (!isEmpty) {
                 sb.append(frameBuilder);
             } else {
