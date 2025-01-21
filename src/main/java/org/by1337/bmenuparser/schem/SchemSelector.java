@@ -25,6 +25,7 @@ import org.by1337.bmenuparser.render.RenderUtil;
 import org.lwjgl.opengl.GL11;
 
 public class SchemSelector {
+    private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
     private boolean enabled = false;
     private BlockPos pos1;
     private BlockPos pos2;
@@ -46,6 +47,7 @@ public class SchemSelector {
                         .executes(ctx -> {
                             PlayerEntity player = MinecraftClient.getInstance().player;
                             pos1 = player.getBlockPos();
+                            fixSize();
                             return 1;
                         })
                 )
@@ -54,6 +56,7 @@ public class SchemSelector {
                         .executes(ctx -> {
                             PlayerEntity player = MinecraftClient.getInstance().player;
                             pos2 = player.getBlockPos();
+                            fixSize();
                             return 1;
                         })
                 )
@@ -94,6 +97,7 @@ public class SchemSelector {
                                         }
                                         pos1 = new BlockPos(region.minX, region.minY, region.minZ);
                                         pos2 = new BlockPos(region.maxX, region.maxY, region.maxZ);
+                                        fixSize();
                                     } else {
                                         ctx.getSource().sendFeedback(new LiteralText("Регион не выбран"));
                                     }
@@ -133,6 +137,7 @@ public class SchemSelector {
                                             region.resize();
                                             pos1 = new BlockPos(region.minX, region.minY, region.minZ);
                                             pos2 = new BlockPos(region.maxX, region.maxY, region.maxZ);
+                                            fixSize();
                                         }
                                     } else {
                                         ctx.getSource().sendFeedback(new LiteralText("Регион не выбран"));
@@ -190,6 +195,30 @@ public class SchemSelector {
 
         }
     }
+
+    private void fixSize() {
+        Region region = new Region(pos1, pos2);
+
+        int width = Math.abs(region.maxX - region.minX);
+        int length = Math.abs(region.maxZ - region.minZ);
+
+        if (width > MAX_SIZE) {
+            region.maxX = region.minX + MAX_SIZE;
+        }
+        if (region.maxY > 255) {
+            region.maxY = 255;
+        }
+        if (region.minY < 0) {
+            region.minY = 0;
+        }
+        if (length > MAX_SIZE) {
+            region.maxZ = region.minZ + MAX_SIZE;
+        }
+
+        pos1 = new BlockPos(region.minX, region.minY, region.minZ);
+        pos2 = new BlockPos(region.maxX, region.maxY, region.maxZ);
+    }
+
 
     private void renderRegion(Box box) {
 
