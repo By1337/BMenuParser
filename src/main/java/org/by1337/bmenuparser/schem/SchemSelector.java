@@ -84,7 +84,7 @@ public class SchemSelector {
                                     if (pos1 != null && pos2 != null) {
                                         Region region = new Region(pos1, pos2);
                                         if (blocks > 0) {
-                                            region.maxX += blocks;
+                                            region.maxY += blocks;
                                             region.resize();
                                             ctx.getSource().sendFeedback(new LiteralText("Регион увеличен по +y на " + blocks + " блоков"));
                                         } else {

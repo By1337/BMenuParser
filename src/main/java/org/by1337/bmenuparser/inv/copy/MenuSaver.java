@@ -231,6 +231,7 @@ public class MenuSaver {
                     isEmpty = false;
                 } else {
                     frameBuilder.append("      - set: ").append(item).append(" ");
+                    slots.forEach(s -> nonAirSlots.put(s, item));
                     isEmpty = false;
                 }
                 frameBuilder.append(Joiner.on(",").join(slots)).append("\n");
