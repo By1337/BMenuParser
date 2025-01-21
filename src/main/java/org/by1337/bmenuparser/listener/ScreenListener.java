@@ -1,5 +1,8 @@
 package org.by1337.bmenuparser.listener;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.loader.api.FabricLoader;
@@ -24,12 +27,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ScreenListener {
+    private boolean enabled = true;
 
     public void register() {
         final int buttonWidth = 58;
         final int buttonHeight = 16;
 
         ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
+            if (!enabled) return;
             if (screen instanceof HandledScreen) {
                 HandledScreen<?> handledScreen = (HandledScreen<?>) screen;
                 Inventory inventory = ScreenUtil.getInventory(handledScreen);
@@ -58,6 +63,18 @@ public class ScreenListener {
                 }
             }
         });
+
+        ClientCommandManager.DISPATCHER.register(LiteralArgumentBuilder.<FabricClientCommandSource>literal("//menu_copy")
+                .executes(ctx -> {
+                    enabled = !enabled;
+                    if (enabled) {
+                        ctx.getSource().sendFeedback(new LiteralText("Копирование меню включено"));
+                    } else {
+                        ctx.getSource().sendFeedback(new LiteralText("Копирование меню выключено"));
+                    }
+                    return 1;
+                })
+        );
     }
 
     private String generateSaveName(MenuSaver menuSaver, HandledScreen<?> screen) {
